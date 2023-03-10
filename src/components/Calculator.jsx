@@ -2,24 +2,37 @@ import React from 'react'
 import {useState} from 'react'
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import {evaluate} from 'mathjs'
 
 import Display from './Display'
 import ButtonList from './ButtonList'
 
 function Calculator() {
-  const [count, setCount] = useState(0);
+  const [expression, setExpression] = useState("");
 
-  const resetCount = () => {setCount(0)}
-  const updateCount = type => {setCount(count+Number(type+"1"))}
+  const specialSymbols = "+-x/.";
+
+  const addToInput = type => {if (!(specialSymbols.includes(type) && specialSymbols.includes(expression.slice(-1)))){ setExpression(expression+type) }}
+  const undo = () => {setExpression(expression.slice(0,-1))}
+  const clear = () => {setExpression("")}
+  const compute =  () => {setExpression(evaluate(expression.replace("x","*")).toString())}
 
   const handleClick = (type) => {
-    type === "RESET" ? resetCount() : updateCount(type) 
+    if (type === "C"){
+      clear();
+    }else if (type === "DEL"){
+      undo();
+    }else if (type === "="){
+      compute();
+    }else{
+      addToInput(type);
+    }
   }
 
   return (
     <Card>
         <CardContent>
-            <Display count={count}/><br/>
+            <Display expression={expression}/><br/>
             <ButtonList handleClick={handleClick}/>
         </CardContent>
     </Card>
